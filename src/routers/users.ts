@@ -6,10 +6,10 @@ type user={
     age: number
 }
 
-type userpost=user | {
-    fullname:string,
-    Dob:number
-}
+// type userpost=user | {
+//     fullname:string,
+//     Dob:number
+// }
 const users:user[] = [
     {
         name:'john',
@@ -26,9 +26,30 @@ router.get('/', (req, res) => {
   })
 
   router.post('/', (req, res) => {
-    const data=req.body as userpost
-    console.log(data)
+    const {name,age}=req.body as user
+    users.push({name,age})
+    console.log(users)
+    
     return res.json({message:'Hello from post!'})
    })
+
+//    router.delete('/:name/:age',(req,res)=>{
+//     const name=req.params.name
+//     const age=parseInt(req.params.age)
+
+//     console.log(name,age)
+//     return res.json({name,age})
+//    })
+
+router.delete("/:name",(req,res)=>{
+    const name=req.params.name
+
+    const index=users.findIndex((user)=>user.name === name)
+    if(index===-1){
+        return res.status(404).json({message:"user not found"})
+    }
+    users.splice(index,1)
+    return res.json ({ message:"user deleted" })
+})
 
   export default router
