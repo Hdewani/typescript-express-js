@@ -62,7 +62,7 @@ router.delete("/:id", (req, res) => {
 })
 
 router.patch("/:id", (req, res) => {
-    UserSchema.findByIdAndUpdate(req.params.id, req.body, {new: true}).then((UserSchema) => {
+    UserSchema.findByIdAndUpdate(req.params.id, req.body).then((UserSchema) => {
         if (!UserSchema) {
             return res.status(404).send();
         }
