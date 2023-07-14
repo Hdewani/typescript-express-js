@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import UserSchema from '../models/user'
+import user from '../models/user'
 const router = Router()
 
 router.post('/', async (req, res) => {
@@ -30,8 +31,47 @@ router.post('/', async (req, res) => {
 		console.log(error)
 		return res.status(500).json({ message: 'something went wrong' })
 	}
+})
 
-	
+router.get("/",async(req,res)=>{
+	// res.send("get req");
+	try {
+		const list= await UserSchema.find({});
+		res.json(list);
+	  } catch (error) {
+		res.json(error);
+	  }
+})	;
+
+// router.delete("/:id",(req,res)=>{
+//     req.params.id
+
+//     return res.json ({ message:"user deleted" })
+// })
+
+router.delete("/:id", (req, res) => {
+    UserSchema.findByIdAndDelete(req.params.id).then((UserSchema) => {
+        if (!UserSchema) {
+            return res.status(404).send();
+        }
+        res.send(UserSchema);
+		console.log("Data base deleted ")
+    }).catch((error) => {
+        res.status(500).send(error);
+    })
+})
+
+router.patch("/:id", (req, res) => {
+    UserSchema.findByIdAndUpdate(req.params.id, req.body, {new: true}).then((UserSchema) => {
+        if (!UserSchema) {
+            return res.status(404).send();
+        }
+        res.send(UserSchema);
+		console.log("Data base updated")
+
+    }).catch((error) => {
+        res.status(500).send(error);
+    })
 })
 
 export default router
