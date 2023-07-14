@@ -33,6 +33,12 @@ router.get('/', (req, res) => {
     return res.json({message:'Hello from post!'})
    })
 
+   router.put("/:name",(req,res)=>{
+    console.log(req.body)
+    return res.json({message:'Hello from put!'})
+
+   })
+
 //    router.delete('/:name/:age',(req,res)=>{
 //     const name=req.params.name
 //     const age=parseInt(req.params.age)
