@@ -2,7 +2,7 @@ import express from 'express'
 // import UserRoute from './routers/users'
 import UserRoute from './routers/postuser'
 import mongoose from 'mongoose'
-import user from './models/user'
+// import user from './models/user'
 const app = express()
 const port = 3000
 
