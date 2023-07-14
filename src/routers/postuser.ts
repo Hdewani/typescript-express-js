@@ -33,13 +33,23 @@ router.post('/', async (req, res) => {
 	}
 })
 
+// router.get("/",async(req,res)=>{
+// 	// res.send("get req");
+// 	try {
+// 		const list= await UserSchema.find({});
+// 		res.json(list);
+// 	  } catch (error) {
+// 		res.json(error);
+// 	  }
+// });
+
 router.get("/",async(req,res)=>{
 	// res.send("get req");
 	try {
 		const list= await UserSchema.find({});
 		res.json(list);
 	  } catch (error) {
-		res.json(error);
+		return res.status(500).json({message:error.message || "internal server error"})
 	  }
 })	;
 
@@ -48,30 +58,58 @@ router.get("/",async(req,res)=>{
 
 //     return res.json ({ message:"user deleted" })
 // })
+// router.delete("/:id", (req, res) => {
+//     UserSchema.findByIdAndDelete(req.params.id).then((UserSchema) => {
+//         if (!UserSchema) {
+//             return res.status(404).send();
+//         }
+//         res.send(UserSchema);
+// 		console.log("Data base deleted ")
+//     }).catch((error) => {
+//         res.status(500).send(error);
+//     })
+// })
 
-router.delete("/:id", (req, res) => {
-    UserSchema.findByIdAndDelete(req.params.id).then((UserSchema) => {
-        if (!UserSchema) {
+
+router.delete("/:id", async (req, res) => {
+	try{
+   const User= await UserSchema.findByIdAndDelete(req.params.id)
+        if (!User) {
             return res.status(404).send();
         }
-        res.send(UserSchema);
 		console.log("Data base deleted ")
-    }).catch((error) => {
-        res.status(500).send(error);
-    })
+		return res.send(User);
+    }
+	catch(error) {
+        res.status(500).json({message:"interval server error"});
+    }
 })
 
-router.patch("/:id", (req, res) => {
-    UserSchema.findByIdAndUpdate(req.params.id, req.body).then((UserSchema) => {
-        if (!UserSchema) {
+// router.patch("/:id", (req, res) => {
+//     UserSchema.findByIdAndUpdate(req.params.id, req.body).then((UserSchema) => {
+//         if (!UserSchema) {
+//             return res.status(404).send();
+//         }
+//         res.send(UserSchema);
+// 		console.log("Data base updated")
+
+//     }).catch((error) => {
+//         res.status(500).send(error);
+//     })
+// })
+
+router.patch("/:id",async (req, res) => {
+	try{
+    const user=await UserSchema.findByIdAndUpdate(req.params.id, req.body)
+        if (!user) {
             return res.status(404).send();
         }
-        res.send(UserSchema);
 		console.log("Data base updated")
-
-    }).catch((error) => {
-        res.status(500).send(error);
-    })
+        res.send(user);
+    }
+	catch(error) {
+		return res.status(500).json({message:error.message || "internal server error"})
+    }
 })
 
 export default router
