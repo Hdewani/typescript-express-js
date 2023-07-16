@@ -1,61 +1,125 @@
-import { Router } from "express"
-const router = Router()
+import { Router } from "express";
+import UserSchema, { User } from "../models/user";
+import { createHash, verifyHash } from "../Controller/auth";
 
-type user={
-    name:string,
-    age: number
+interface LoginInput {
+  username?: string;
+  password?: string;
+}
+interface UserInput extends LoginInput {
+  fullname?: string;
+  email?: string;
+  phone?: string;
 }
 
-// type userpost=user | {
-//     fullname:string,
-//     Dob:number
-// }
-const users:user[] = [
-    {
-        name:'john',
-        age:20,
-    },
-    {
-        name:'doe',
-        age:21,
-    },
-]
+const router = Router();
+router.post("/", async (req, res) => {
+  console.log("signup");
+});
 
-router.get('/', (req, res) => {
-   return res.json(users)
-  })
+router.post("/signup", async (req, res) => {
+  try {
+    const formData = req.body as UserInput;
+    //1.username and password  are required fields
+    if (!formData.username)
+      return res.status(400).json({ message: "username is required" });
 
-  router.post('/', (req, res) => {
-    const {name,age}=req.body as user
-    users.push({name,age})
-    console.log(users)
-    
-    return res.json({message:'Hello from post!'})
-   })
+    if (!formData.password)
+      return res.status(400).json({ message: "password is required" });
 
-   router.put("/:name",(req,res)=>{
-    console.log(req.body)
-    return res.json({message:'Hello from put!'})
+    //1.1 username should be unique
+    const ExistingUser = await UserSchema.findOne({
+      username: formData.username,
+    });
 
-   })
-
-//    router.delete('/:name/:age',(req,res)=>{
-//     const name=req.params.name
-//     const age=parseInt(req.params.age)
-
-//     console.log(name,age)
-//     return res.json({name,age})
-//    })
-
-router.delete("/:name",(req,res)=>{
-    const name=req.params.name
-
-    const index=users.findIndex((user)=>user.name === name)
-    if(index===-1){
-        return res.status(404).json({message:"user not found"})
+    if (ExistingUser) {
+      return res.status(400).json({ message: "username already exists " });
     }
-    users.splice(index,1)
-    return res.json ({ message:"user deleted" })
-})
 
-  export default router
+    //2. passowrd has to be alteast 8 chars
+    if (formData.password.length < 8) {
+      return res.status(400).json({
+        message: "password should be atleast 8 char long",
+      });
+    }
+
+    //3.hash the password
+    const hashedPassword = await createHash(formData.password);
+
+    //4.save the user in database
+    const newUser = await UserSchema.create({
+      username: formData.username,
+      password: hashedPassword,
+      fullname: formData.fullname,
+      email: formData.email,
+      phone: formData.phone,
+    });
+    //5. retrun the user & accesstoken
+
+    return res.json({
+      message: "user created successfully",
+      payload: {
+        username: newUser.username,
+        fullname: newUser.fullname,
+        email: newUser.email,
+        phone: newUser.phone,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "internal server error" });
+  }
+});
+
+
+router.post('/login', async (req, res) => {
+	try {
+    //& 1.username and pasword are required
+    const { username, password } = req.body as LoginInput;
+
+    if (!username)
+      return res.status(400).json({ message: "username is required" });
+
+    if (!password)
+      return res.status(400).json({ message: "password is required" });
+
+    //& 2.username should exist in the database
+    const user = await UserSchema.findOne({ username });
+
+    //& 2.1 if not user then return error 404
+    if (!user) return res.status(400).json({ message: "user not found" });
+
+    //& 3.verify the password
+    const result = await verifyHash(password, user.password);
+
+    //& 3.1 if password is wrong then retrun error 400
+    if (!result) return res.status(400).json({ message: "wrong password" });
+
+    //& 3.2 if password is correct  then retrun user with accessToken
+    return res.json({
+      message: "user logged-in Successfully",
+      payload: {
+        username: user.username,
+        fullname: user.fullname,
+        email: user.email,
+        phone: user.phone,
+        accessToken:"dummy",
+        
+      },
+    });
+
+    //&  4.retrun the user and accesstoken
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+
+
+
+
+
+export default router;
+
+

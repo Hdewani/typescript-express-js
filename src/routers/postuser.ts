@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import UserSchema from '../models/user'
-import user from '../models/user'
+// import user from '../models/user'
 const router = Router()
 
 router.post('/', async (req, res) => {

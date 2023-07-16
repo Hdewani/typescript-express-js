@@ -1,16 +1,17 @@
 import express from 'express'
-// import UserRoute from './routers/users'
-import UserRoute from './routers/postuser'
+import UserRoute from './routers/users'
 import mongoose from 'mongoose'
+import { env } from './environment'
+// import UserRoute from './routers/postuser'
 // import user from './models/user'
+
 const app = express()
 const port = 3000
 
 app.use(express.json())
-const mongoURI="mongodb+srv://hdewani2002:GE4I7gBMoXQ4RH67@cluster0.tr56hkn.mongodb.net/?retryWrites=true&w=majority"
- 
-app.use("/postuser",UserRoute)
-// app.use("/user",UserRoute)
+// const mongoURI="mongodb+srv://hdewani2002:GE4I7gBMoXQ4RH67@cluster0.tr56hkn.mongodb.net/?retryWrites=true&w=majority"
+// app.use("/postuser",UserRoute)
+app.use("/users",UserRoute)
 
 
 app.route('/').get((req,res)=>{
@@ -23,7 +24,7 @@ app.route('/').get((req,res)=>{
 
 function main(){
     //connect to mongodb
-    mongoose.connect(mongoURI )
+    mongoose.connect(env.mongoURI)
     .then(()=>{
         console.log("connected to mongodb")
         app.listen(port,()=>{
