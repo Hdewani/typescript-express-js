@@ -1,11 +1,20 @@
 import { Router } from 'express'
 import UserSchema from '../models/user'
 // import user from '../models/user'
+
+
+interface user{
+	  name: string
+	username: string
+	email: string
+	password: string
+	phone: string
+}
 const router = Router()
 
 router.post('/', async (req, res) => {
 	try {
-		const { name, password, email, username } = req.body 
+		const { name, password, email, username } = req.body  as user
 
 		if (!password || !username) {
 			return res
@@ -73,15 +82,15 @@ router.get("/",async(req,res)=>{
 
 router.delete("/:id", async (req, res) => {
 	try{
-   const User= await UserSchema.findByIdAndDelete(req.params.id)
+   const User= await UserSchema.findByIdAndDelete(req.params.id)    
         if (!User) {
-            return res.status(404).send();
+            return res.status(407).send();
         }
 		console.log("Data base deleted ")
 		return res.send(User);
     }
 	catch(error) {
-        res.status(500).json({message:"interval server error"});
+        res.status(400).json({message:"interval server error"});
     }
 })
 
@@ -100,7 +109,7 @@ router.delete("/:id", async (req, res) => {
 
 router.patch("/:id",async (req, res) => {
 	try{
-    const user=await UserSchema.findByIdAndUpdate(req.params.id, req.body)
+    const user=await UserSchema.findByIdAndUpdate(req.params.id, req.body as user)
         if (!user) {
             return res.status(404).send();
         }
