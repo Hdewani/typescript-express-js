@@ -24,6 +24,7 @@ const tokenRequired: RequestHandler = async (req, res, next) => {
 			return res.status(401).json({ message: result.message })
 
 		console.log(result)
+		// return res.json(user.toObject()) 
 		next()
 	} catch (error) {
 		return res.status(500).json({ message: 'Internal Server Error' })

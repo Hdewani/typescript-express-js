@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken'
 import argon2 from 'argon2'
 import {env} from '../environment'
+import user from '../models/user'
 
 export async function createHash(password: string): Promise<string> {
 	return await argon2.hash(password)
@@ -32,6 +33,7 @@ type AccessTokenPayload<T> = {
 	success: boolean
 	message: string
 	decoded?: T
+
 }
 
 export function checkAccessToken<T>(token: string): AccessTokenPayload<T> {
@@ -41,6 +43,7 @@ export function checkAccessToken<T>(token: string): AccessTokenPayload<T> {
 			success: true,
 			message: 'Token is valid',
 			decoded: decoded as T,
+			
 		}
 	} catch (error: any) {
 		return {

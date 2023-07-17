@@ -18,8 +18,10 @@ const router=Router()
 //     next()
 // })
 
-router.get("/",(req,res)=>{
+router.get("/",async(req,res)=>{
     return res.json({message:"hello from protcted route "})
+    
+    
 })
 
 
